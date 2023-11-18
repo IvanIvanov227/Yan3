@@ -1,25 +1,25 @@
-import sys
-from PyQt5 import uic
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem
+from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem
 import sqlite3
+from release.addEditCoffeeForm import Ui_Form
+from main_ui import Ui_MainWindow
 
 
 class ErrorLen(Exception):
     pass
 
 
-class MyWidget(QMainWindow):
+class MyWidget(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
+        self.setupUi(self)
         self.edit_coffee = None
         self.add_coffee = None
-        uic.loadUi('main.ui', self)
         self.update()
         self.addButton.clicked.connect(self.add_info)
         self.editButton.clicked.connect(self.edit_info)
 
     def update(self):
-        con = sqlite3.connect('coffee.sqlite')
+        con = sqlite3.connect('../data/coffee.sqlite')
         cur = con.cursor()
         string = 'SELECT * FROM coffee_info'
         result = cur.execute(string).fetchall()
@@ -44,12 +44,12 @@ class MyWidget(QMainWindow):
         self.edit_coffee.show()
 
 
-class AddEditCoffeeForm(QMainWindow):
+class AddEditCoffeeForm(QMainWindow, Ui_Form):
     def __init__(self, parent=None, coffee_id=None):
         super().__init__(parent)
-        uic.loadUi('addEditCoffeeForm.ui', self)
+        self.setupUi(self)
         self.coffee_id = coffee_id
-        self.con = sqlite3.connect('coffee.sqlite')
+        self.con = sqlite3.connect('../data/coffee.sqlite')
         self.cur = self.con.cursor()
 
         if coffee_id is None:
@@ -133,10 +133,3 @@ class AddEditCoffeeForm(QMainWindow):
 
         except ErrorLen:
             pass
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = MyWidget()
-    ex.show()
-    sys.exit(app.exec())
